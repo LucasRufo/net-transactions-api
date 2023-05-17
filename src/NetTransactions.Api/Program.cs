@@ -1,17 +1,23 @@
+using NetTransactions.Api.Configuration.Swagger;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+ConfigureServices();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
+ConfigureApp();
 
 app.Run();
 
+void ConfigureServices()
+{
+    builder.Services.AddControllers();
+    builder.Services.AddSwagger();
+}
+
+void ConfigureApp()
+{
+    app.UseSwaggerCustom();
+    app.MapControllers();
+}
