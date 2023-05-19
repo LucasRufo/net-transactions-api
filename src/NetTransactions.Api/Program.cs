@@ -1,3 +1,5 @@
+using NetTransactions.Api.Configuration.ApplicationServices;
+using NetTransactions.Api.Configuration.DatabaseContext;
 using NetTransactions.Api.Configuration.HealthCheck;
 using NetTransactions.Api.Configuration.Swagger;
 
@@ -15,7 +17,9 @@ void ConfigureServices()
 {
     builder.Services.AddControllers();
     builder.Services.AddSwagger();
+    builder.Services.AddDatabaseContext(builder.Configuration);
     builder.Services.AddHealthCheck(builder.Configuration);
+    builder.Services.AddApplicationServices();
 }
 
 void ConfigureApp()
