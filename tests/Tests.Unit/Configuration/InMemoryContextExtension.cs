@@ -9,12 +9,12 @@ public static class InMemoryContextExtension
 {
     public static AutoFake WithInMemoryContext(this AutoFake autoFake)
     {
-        var options = new DbContextOptionsBuilder<TransactionsDbContext>()
+        var options = new DbContextOptionsBuilder<DbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .ConfigureWarnings(x => x.Ignore(InMemoryEventId.TransactionIgnoredWarning))
             .Options;
 
-        autoFake.Provide(new TransactionsDbContext(options));
+        autoFake.Provide(new DbContext(options));
 
         return autoFake;
     }

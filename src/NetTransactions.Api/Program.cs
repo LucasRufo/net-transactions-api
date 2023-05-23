@@ -28,3 +28,5 @@ void ConfigureApp()
     app.UseHealthCheck();
     app.MapControllers();
 }
+
+public partial class Program { }

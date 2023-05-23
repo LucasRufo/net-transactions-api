@@ -13,7 +13,7 @@ public class ParticipantRepository
 
     public async Task Create(Participant participant)
     {
-        await _dbContext.Participant.AddAsync(participant);
+        await _dbContext.AddAsync(participant);
         await _dbContext.SaveChangesAsync();
     }
 }

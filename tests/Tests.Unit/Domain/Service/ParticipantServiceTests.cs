@@ -1,8 +1,4 @@
-﻿using Autofac.Extras.FakeItEasy;
-using FakeItEasy;
-using FluentAssertions;
-using NetTransactions.Api.Domain.Entities;
-using NetTransactions.Api.Domain.Services;
+﻿using NetTransactions.Api.Domain.Services;
 using NetTransactions.Api.Infrastructure.DateTimeProvider;
 using NetTransactions.Api.Infrastructure.Repositories;
 using Tests.Common.Builders.Domain.Entities;
@@ -31,9 +27,14 @@ public class ParticipantServiceTests : TestsBase
             .Resolve<IDateTimeProvider>().UtcNow)
             .Returns(createdAtFake);
 
-        var participantResult = await AutoFake.Resolve<ParticipantService>().Create(createParticipantRequest);
+        var participantResult = await AutoFake.Resolve<ParticipantService>()
+            .Create(createParticipantRequest);
 
         var expectedParticipant = new ParticipantBuilder()
+            .WithId(participantResult.Value.Id)
+            .WithName(createParticipantRequest.Name)
+            .WithEmail(createParticipantRequest.Email)
+            .WithDocument(createParticipantRequest.Document)
             .WithCreatedAt(createdAtFake)
             .WithUpdateAt(null)
             .Generate();
