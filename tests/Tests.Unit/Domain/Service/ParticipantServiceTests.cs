@@ -18,6 +18,37 @@ public class ParticipantServiceTests : TestsBase
     }
 
     [Test]
+    public async Task ShouldGetAllParticipants()
+    {
+        var expectedParticipants = new ParticipantBuilder().Generate(3);
+
+        A.CallTo(() => AutoFake
+            .Resolve<ParticipantRepository>().Get())
+            .Returns(expectedParticipants);
+
+        var participants = await AutoFake.Resolve<ParticipantService>()
+            .Get();
+
+        participants.Count.Should().NotBe(0);
+        participants.Should().BeEquivalentTo(expectedParticipants);
+    }
+
+    [Test]
+    public async Task ShouldGetParticipantById()
+    {
+        var expectedParticipant = new ParticipantBuilder().Generate();
+
+        A.CallTo(() => AutoFake
+            .Resolve<ParticipantRepository>().GetById(expectedParticipant.Id))
+            .Returns(expectedParticipant);
+
+        var participant = await AutoFake.Resolve<ParticipantService>()
+            .GetById(expectedParticipant.Id);
+
+        participant.Should().BeEquivalentTo(expectedParticipant);
+    }
+
+    [Test]
     public async Task ShouldCreateParticipant()
     {
         var createParticipantRequest = new CreateParticipantRequestBuilder().Generate();

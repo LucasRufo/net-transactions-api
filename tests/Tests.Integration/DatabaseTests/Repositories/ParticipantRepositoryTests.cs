@@ -13,16 +13,23 @@ public class ParticipantRepositoryTests : IntegrationTestsBase
     public void SetUp() => _participantRepository = ServiceProvider.GetRequiredService<ParticipantRepository>();
 
     [Test]
-    public async Task ShouldCreateParticipant()
+    public async Task ShouldGetAllParticipants()
     {
-        var expectedParticipant = new ParticipantBuilder().Generate();
+        var expectedParticipants = new ParticipantBuilder().GenerateInDatabase(Context, 5);
 
-        await _participantRepository.Create(expectedParticipant);
+        var participants = await _participantRepository.Get();
 
-        var returnedParticipant = ContextForAsserts.Participant
-                    .FirstOrDefault(x => x.Id == expectedParticipant.Id);
+        participants.Should().BeEquivalentTo(expectedParticipants);
+    }
 
-        returnedParticipant.Should().BeEquivalentTo(expectedParticipant);
+    [Test]
+    public async Task ShouldGetParticipantById()
+    {
+        var expectedParticipant = new ParticipantBuilder().GenerateInDatabase(Context);
+
+        var participant = await _participantRepository.GetById(expectedParticipant.Id);
+
+        participant.Should().BeEquivalentTo(expectedParticipant);
     }
 
     [Test]
@@ -30,8 +37,21 @@ public class ParticipantRepositoryTests : IntegrationTestsBase
     {
         var expectedParticipant = new ParticipantBuilder().GenerateInDatabase(Context);
 
-        var participantFromDb = await _participantRepository.GetByCPF(expectedParticipant.CPF);
+        var participant = await _participantRepository.GetByCPF(expectedParticipant.CPF);
 
-        participantFromDb.Should().BeEquivalentTo(expectedParticipant);
+        participant.Should().BeEquivalentTo(expectedParticipant);
+    }
+
+    [Test]
+    public async Task ShouldCreateParticipant()
+    {
+        var expectedParticipant = new ParticipantBuilder().Generate();
+
+        await _participantRepository.Create(expectedParticipant);
+
+        var participant = ContextForAsserts.Participant
+                    .FirstOrDefault(x => x.Id == expectedParticipant.Id);
+
+        participant.Should().BeEquivalentTo(expectedParticipant);
     }
 }
