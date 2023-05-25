@@ -15,12 +15,12 @@ namespace NetTransactions.Api.Controllers.v1;
 public class ParticipantController : ControllerBase
 {
     private readonly ParticipantService _participantService;
-    private readonly IValidator<CreateParticipantRequest> _createParticipantValidator;
+    private readonly IValidator<ParticipantRequest> _participantValidator;
 
-    public ParticipantController(ParticipantService participantService, IValidator<CreateParticipantRequest> validator)
+    public ParticipantController(ParticipantService participantService, IValidator<ParticipantRequest> validator)
     {
         _participantService = participantService;
-        _createParticipantValidator = validator;
+        _participantValidator = validator;
     }
 
     [HttpGet]
@@ -43,9 +43,9 @@ public class ParticipantController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateParticipantRequest request)
+    public async Task<IActionResult> Create(ParticipantRequest request)
     {
-        var validationResult = await _createParticipantValidator.ValidateAsync(request);
+        var validationResult = await _participantValidator.ValidateAsync(request);
 
         if (!validationResult.IsValid)
             return BadRequest(new CustomProblemDetails(HttpStatusCode.BadRequest, Request.Path, validationResult.ToCustomProblemDetailsError()));
@@ -53,5 +53,21 @@ public class ParticipantController : ControllerBase
         var participant = await _participantService.Create(request);
 
         return Ok(participant.Value);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(Guid id, ParticipantRequest request)
+    {
+        var validationResult = await _participantValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+            return BadRequest(new CustomProblemDetails(HttpStatusCode.BadRequest, Request.Path, validationResult.ToCustomProblemDetailsError()));
+
+        var updatedParticipantResult = await _participantService.Update(id, request);
+
+        if (updatedParticipantResult.IsError && updatedParticipantResult.FirstError.Type == ErrorOr.ErrorType.NotFound)
+            return NotFound();
+
+        return Ok(updatedParticipantResult.Value);
     }
 }

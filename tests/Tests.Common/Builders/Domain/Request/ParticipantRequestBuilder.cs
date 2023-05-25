@@ -4,28 +4,28 @@ using NetTransactions.Api.Domain.Request;
 
 namespace Tests.Common.Builders.Domain.Request;
 
-public class CreateParticipantRequestBuilder : Faker<CreateParticipantRequest>
+public class ParticipantRequestBuilder : Faker<ParticipantRequest>
 {
-	public CreateParticipantRequestBuilder()
+	public ParticipantRequestBuilder()
 	{
 		RuleFor(x => x.Name, faker => faker.Name.FullName());
 		RuleFor(x => x.CPF, faker => faker.Person.Cpf(false));
 		RuleFor(x => x.Email, faker => faker.Internet.Email());
 	}
 
-    public CreateParticipantRequestBuilder WithName(string name)
+    public ParticipantRequestBuilder WithName(string name)
     {
         RuleFor(x => x.Name, faker => name);
         return this;
     }
 
-    public CreateParticipantRequestBuilder WithCPF(string cpf)
+    public ParticipantRequestBuilder WithCPF(string cpf)
     {
         RuleFor(x => x.CPF, faker => cpf);
         return this;
     }
 
-    public CreateParticipantRequestBuilder WithEmail(string email)
+    public ParticipantRequestBuilder WithEmail(string email)
     {
         RuleFor(x => x.Email, faker => email);
         return this;

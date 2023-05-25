@@ -22,7 +22,7 @@ public class ParticipantService
     public async Task<Participant?> GetById(Guid id)
         => await _participantRepository.GetById(id);
 
-    public async Task<ErrorOr<Participant>> Create(CreateParticipantRequest request)
+    public async Task<ErrorOr<Participant>> Create(ParticipantRequest request)
     {
         var participant = new Participant()
         {
@@ -32,7 +32,24 @@ public class ParticipantService
             CreatedAt = _dateTimeProvider.UtcNow
         };
 
-        await _participantRepository.Create(participant);
+        await _participantRepository.Save(participant);
+
+        return participant;
+    }
+
+    public async Task<ErrorOr<Participant>> Update(Guid id, ParticipantRequest request)
+    {
+        var participant = await _participantRepository.GetById(id);
+
+        if (participant is null)
+            return Error.NotFound();
+
+        participant.Name = request.Name;
+        participant.CPF = request.CPF;
+        participant.Email = request.Email;
+        participant.UpdatedAt = _dateTimeProvider.UtcNow;
+
+        await _participantRepository.Save(participant);
 
         return participant;
     }

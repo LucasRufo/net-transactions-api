@@ -1,6 +1,5 @@
 ﻿using Bogus.Extensions.Brazil;
 using FluentValidation.TestHelper;
-using NetTransactions.Api.Domain.Request;
 using NetTransactions.Api.Domain.Validators;
 using NetTransactions.Api.Infrastructure.Repositories;
 using Tests.Common.Builders.Domain.Entities;
@@ -8,7 +7,7 @@ using Tests.Common.Builders.Domain.Request;
 
 namespace Tests.Unit.Domain.Validators;
 
-public class CreateParticipantRequestValidatorTests : TestsBase
+public class ParticipantRequestValidatorTests : TestsBase
 {
     [SetUp]
     public void SetUp() => AutoFake.Provide(A.Fake<ParticipantRepository>());
@@ -16,11 +15,11 @@ public class CreateParticipantRequestValidatorTests : TestsBase
     [Test]
     public async Task ShouldNotBeValidWhenNameIsEmpty()
     {
-        var createParticipantRequest = new CreateParticipantRequestBuilder()
+        var createParticipantRequest = new ParticipantRequestBuilder()
             .WithName("")
             .Generate();
 
-        var validate = await AutoFake.Resolve<CreateParticipantRequestValidator>()
+        var validate = await AutoFake.Resolve<ParticipantRequestValidator>()
             .TestValidateAsync(createParticipantRequest);
 
         validate.ShouldHaveValidationErrorFor(x => x.Name)
@@ -32,11 +31,11 @@ public class CreateParticipantRequestValidatorTests : TestsBase
     {
         var invalidLength = 201;
 
-        var createParticipantRequest = new CreateParticipantRequestBuilder()
+        var createParticipantRequest = new ParticipantRequestBuilder()
             .WithName(Faker.Random.String(invalidLength))
             .Generate();
 
-        var validate = await AutoFake.Resolve<CreateParticipantRequestValidator>()
+        var validate = await AutoFake.Resolve<ParticipantRequestValidator>()
             .TestValidateAsync(createParticipantRequest);
 
         validate.ShouldHaveValidationErrorFor(x => x.Name)
@@ -46,11 +45,11 @@ public class CreateParticipantRequestValidatorTests : TestsBase
     [Test]
     public async Task ShouldNotBeValidWhenEmailIsEmpty()
     {
-        var createParticipantRequest = new CreateParticipantRequestBuilder()
+        var createParticipantRequest = new ParticipantRequestBuilder()
             .WithEmail("")
             .Generate();
 
-        var validate = await AutoFake.Resolve<CreateParticipantRequestValidator>()
+        var validate = await AutoFake.Resolve<ParticipantRequestValidator>()
             .TestValidateAsync(createParticipantRequest);
 
         validate.ShouldHaveValidationErrorFor(x => x.Email)
@@ -62,11 +61,11 @@ public class CreateParticipantRequestValidatorTests : TestsBase
     {
         var invalidLength = 201;
 
-        var createParticipantRequest = new CreateParticipantRequestBuilder()
+        var createParticipantRequest = new ParticipantRequestBuilder()
             .WithEmail(Faker.Random.String(invalidLength))
             .Generate();
 
-        var validate = await AutoFake.Resolve<CreateParticipantRequestValidator>()
+        var validate = await AutoFake.Resolve<ParticipantRequestValidator>()
             .TestValidateAsync(createParticipantRequest);
 
         validate.ShouldHaveValidationErrorFor(x => x.Email)
@@ -76,11 +75,11 @@ public class CreateParticipantRequestValidatorTests : TestsBase
     [Test]
     public async Task ShouldNotBeValidWhenEmailIsNotAnEmailAdress()
     {
-        var createParticipantRequest = new CreateParticipantRequestBuilder()
+        var createParticipantRequest = new ParticipantRequestBuilder()
             .WithEmail("notanemailadress.com")
             .Generate();
 
-        var validate = await AutoFake.Resolve<CreateParticipantRequestValidator>()
+        var validate = await AutoFake.Resolve<ParticipantRequestValidator>()
             .TestValidateAsync(createParticipantRequest);
 
         validate.ShouldHaveValidationErrorFor(x => x.Email)
@@ -90,11 +89,11 @@ public class CreateParticipantRequestValidatorTests : TestsBase
     [Test]
     public async Task ShouldNotBeValidWhenCPFIsEmpty()
     {
-        var createParticipantRequest = new CreateParticipantRequestBuilder()
+        var createParticipantRequest = new ParticipantRequestBuilder()
             .WithCPF("")
             .Generate();
 
-        var validate = await AutoFake.Resolve<CreateParticipantRequestValidator>()
+        var validate = await AutoFake.Resolve<ParticipantRequestValidator>()
             .TestValidateAsync(createParticipantRequest);
 
         validate.ShouldHaveValidationErrorFor(x => x.CPF)
@@ -104,11 +103,11 @@ public class CreateParticipantRequestValidatorTests : TestsBase
     [Test]
     public async Task ShouldNotBeValidWhenCPFIsInvalid()
     {
-        var createParticipantRequest = new CreateParticipantRequestBuilder()
+        var createParticipantRequest = new ParticipantRequestBuilder()
             .WithCPF("12345678910")
             .Generate();
 
-        var validate = await AutoFake.Resolve<CreateParticipantRequestValidator>()
+        var validate = await AutoFake.Resolve<ParticipantRequestValidator>()
             .TestValidateAsync(createParticipantRequest);
 
         validate.ShouldHaveValidationErrorFor(x => x.CPF)
@@ -120,7 +119,7 @@ public class CreateParticipantRequestValidatorTests : TestsBase
     {
         var cpf = Faker.Person.Cpf();
 
-        var createParticipantRequest = new CreateParticipantRequestBuilder()
+        var createParticipantRequest = new ParticipantRequestBuilder()
             .WithCPF(cpf)
             .Generate();
 
@@ -128,7 +127,7 @@ public class CreateParticipantRequestValidatorTests : TestsBase
             .GetByCPF(cpf))
             .Returns(new ParticipantBuilder().WithCPF(cpf).Generate());
 
-        var validate = await AutoFake.Resolve<CreateParticipantRequestValidator>()
+        var validate = await AutoFake.Resolve<ParticipantRequestValidator>()
             .TestValidateAsync(createParticipantRequest);
 
         validate.ShouldHaveValidationErrorFor(x => x.CPF)

@@ -55,7 +55,7 @@ public class ParticipantEndpointTests : IntegrationTestsBase
     [Test]
     public async Task CreateShouldReturnSuccessAndParticipant()
     {
-        var createParticipantRequest = new CreateParticipantRequestBuilder().Generate();
+        var createParticipantRequest = new ParticipantRequestBuilder().Generate();
 
         var response = await _httpClient.PostAsync(_baseUri, createParticipantRequest.ToJsonContent());
 
@@ -70,7 +70,7 @@ public class ParticipantEndpointTests : IntegrationTestsBase
     [Test]
     public async Task CreateShouldReturnBadRequestWhenRequestIsInvalid()
     {
-        var createParticipantRequest = new CreateParticipantRequestBuilder()
+        var createParticipantRequest = new ParticipantRequestBuilder()
             .WithName("")
             .Generate();
 

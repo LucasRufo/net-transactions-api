@@ -34,7 +34,7 @@ public static class ApplicationServicesConfiguration
 
     private static IServiceCollection AddValidators(this IServiceCollection services)
     {
-        services.AddValidatorsFromAssemblyContaining<CreateParticipantRequestValidator>();
+        services.AddValidatorsFromAssemblyContaining<ParticipantRequestValidator>();
 
         return services;
     }

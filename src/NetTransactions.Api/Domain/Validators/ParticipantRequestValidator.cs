@@ -4,9 +4,9 @@ using NetTransactions.Api.Infrastructure.Repositories;
 
 namespace NetTransactions.Api.Domain.Validators;
 
-public class CreateParticipantRequestValidator : AbstractValidator<CreateParticipantRequest>
+public class ParticipantRequestValidator : AbstractValidator<ParticipantRequest>
 {
-    public CreateParticipantRequestValidator(ParticipantRepository participantRepository)
+    public ParticipantRequestValidator(ParticipantRepository participantRepository)
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
 

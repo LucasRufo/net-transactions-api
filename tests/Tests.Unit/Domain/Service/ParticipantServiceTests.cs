@@ -51,7 +51,7 @@ public class ParticipantServiceTests : TestsBase
     [Test]
     public async Task ShouldCreateParticipant()
     {
-        var createParticipantRequest = new CreateParticipantRequestBuilder().Generate();
+        var createParticipantRequest = new ParticipantRequestBuilder().Generate();
         var createdAtFake = Faker.Date.Past();
 
         A.CallTo(() => AutoFake
