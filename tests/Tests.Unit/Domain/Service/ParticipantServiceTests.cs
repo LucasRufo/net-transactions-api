@@ -34,7 +34,7 @@ public class ParticipantServiceTests : TestsBase
             .WithId(participantResult.Value.Id)
             .WithName(createParticipantRequest.Name)
             .WithEmail(createParticipantRequest.Email)
-            .WithDocument(createParticipantRequest.Document)
+            .WithCPF(createParticipantRequest.CPF)
             .WithCreatedAt(createdAtFake)
             .WithUpdateAt(null)
             .Generate();

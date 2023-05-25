@@ -1,5 +1,7 @@
-﻿using NetTransactions.Api.Domain.Entities;
+﻿using NetTransactions.Api.Controllers.Shared;
+using NetTransactions.Api.Domain.Entities;
 using NetTransactions.Api.Domain.Response;
+using System.Net;
 using Tests.Common.Builders.Domain.Request;
 using Tests.Integration.Configuration.Extensions;
 
@@ -27,5 +29,26 @@ public class ParticipantEndpointTests : IntegrationTestsBase
 
         response.Should().Be200Ok();
         response.Content.ShouldBeEquivalentTo<ParticipantResponse, Participant>(participantFromDb);
+    }
+
+    [Test]
+    public async Task CreateShouldReturnBadRequestWhenRequestIsInvalid()
+    {
+        var createParticipantRequest = new CreateParticipantRequestBuilder()
+            .WithName("")
+            .Generate();
+
+        var response = await _httpClient.PostAsync(_baseUri, createParticipantRequest.ToJsonContent());
+
+        var customProblemDetailsExpected = new CustomProblemDetails(
+            HttpStatusCode.BadRequest, 
+            _baseUri, 
+            new List<CustomProblemDetailsError>() 
+            {
+                new CustomProblemDetailsError("Name", "'Name' must not be empty.")
+            });
+
+        response.Should().Be400BadRequest();
+        response.Content.ShouldBeEquivalentTo<CustomProblemDetails, CustomProblemDetails>(customProblemDetailsExpected);
     }
 }

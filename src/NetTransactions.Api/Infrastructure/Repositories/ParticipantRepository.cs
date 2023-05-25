@@ -1,4 +1,5 @@
-﻿using NetTransactions.Api.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using NetTransactions.Api.Domain.Entities;
 
 namespace NetTransactions.Api.Infrastructure.Repositories;
 
@@ -10,6 +11,9 @@ public class ParticipantRepository
     {
         _dbContext = context;
     }
+
+    public virtual async Task<Participant?> GetByCPF(string cpf)
+        => await _dbContext.Participant.FirstOrDefaultAsync(x => x.CPF == cpf);
 
     public async Task Create(Participant participant)
     {
