@@ -1,4 +1,6 @@
-﻿using System.Net.Http.Json;
+﻿using NetTransactions.Api.Controllers.Shared;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace Tests.Integration.Configuration.Extensions;
 

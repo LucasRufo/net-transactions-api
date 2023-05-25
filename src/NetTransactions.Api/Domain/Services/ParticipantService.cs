@@ -21,7 +21,7 @@ public class ParticipantService
         var participant = new Participant()
         {
             Name = request.Name,
-            Document = request.Document,
+            CPF = request.CPF,
             Email = request.Email,
             CreatedAt = _dateTimeProvider.UtcNow
         };

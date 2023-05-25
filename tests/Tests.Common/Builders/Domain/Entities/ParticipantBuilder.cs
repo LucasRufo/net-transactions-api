@@ -9,7 +9,7 @@ public class ParticipantBuilder : Faker<Participant>
 	{
         RuleFor(x => x.Id, faker => faker.Random.Guid());
         RuleFor(x => x.Name, faker => faker.Name.FullName());
-        RuleFor(x => x.Document, faker => faker.Random.ReplaceNumbers("###########"));
+        RuleFor(x => x.CPF, faker => faker.Random.ReplaceNumbers("###########"));
         RuleFor(x => x.Email, faker => faker.Internet.Email());
         RuleFor(x => x.CreatedAt, faker => DateTime.UtcNow);
         RuleFor(x => x.UpdatedAt, faker => null);
@@ -27,9 +27,9 @@ public class ParticipantBuilder : Faker<Participant>
         return this;
     }
 
-    public ParticipantBuilder WithDocument(string document)
+    public ParticipantBuilder WithCPF(string cpf)
     {
-        RuleFor(x => x.Document, faker => document);
+        RuleFor(x => x.CPF, faker => cpf);
         return this;
     }
 

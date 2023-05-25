@@ -1,7 +1,11 @@
 ﻿using Asp.Versioning;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using NetTransactions.Api.Controllers.Shared;
 using NetTransactions.Api.Domain.Request;
 using NetTransactions.Api.Domain.Services;
+using NetTransactions.Api.Extensions;
+using System.Net;
 
 namespace NetTransactions.Api.Controllers.v1;
 
@@ -11,10 +15,12 @@ namespace NetTransactions.Api.Controllers.v1;
 public class ParticipantController : ControllerBase
 {
     private readonly ParticipantService _participantService;
+    private readonly IValidator<CreateParticipantRequest> _createParticipantValidator;
 
-    public ParticipantController(ParticipantService participantService)
+    public ParticipantController(ParticipantService participantService, IValidator<CreateParticipantRequest> validator)
     {
         _participantService = participantService;
+        _createParticipantValidator = validator;
     }
 
     [HttpGet]
@@ -26,6 +32,11 @@ public class ParticipantController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(CreateParticipantRequest request)
     {
+        var validationResult = await _createParticipantValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+            return BadRequest(new CustomProblemDetails(HttpStatusCode.BadRequest, Request.Path, validationResult.ToCustomProblemDetailsError()));
+
         var participant = await _participantService.Create(request);
 
         return Ok(participant.Value);
