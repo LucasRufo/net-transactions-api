@@ -58,6 +58,7 @@ public class ParticipantController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(Guid id, ParticipantRequest request)
     {
+        //change back to CreateParticipantRequest and UpdateParticipantRequest
         var validationResult = await _participantValidator.ValidateAsync(request);
 
         if (!validationResult.IsValid)
