@@ -16,6 +16,12 @@ public class ParticipantService
         _dateTimeProvider = dateTimeProvider;
     }
 
+    public async Task<ICollection<Participant>> Get()
+        => await _participantRepository.Get();
+
+    public async Task<Participant?> GetById(Guid id)
+        => await _participantRepository.GetById(id);
+
     public async Task<ErrorOr<Participant>> Create(CreateParticipantRequest request)
     {
         var participant = new Participant()

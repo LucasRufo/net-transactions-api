@@ -1,7 +1,8 @@
 ﻿using NetTransactions.Api.Controllers.Shared;
 using NetTransactions.Api.Domain.Entities;
-using NetTransactions.Api.Domain.Response;
 using System.Net;
+using System.Net.Http.Json;
+using Tests.Common.Builders.Domain.Entities;
 using Tests.Common.Builders.Domain.Request;
 using Tests.Integration.Configuration.Extensions;
 
@@ -19,7 +20,40 @@ public class ParticipantEndpointTests : IntegrationTestsBase
     }
 
     [Test]
-    public async Task CreateShouldReturnSuccessStatusCodeAndParticipant()
+    public async Task GetShouldReturnSuccessAndParticipants()
+    {
+        new ParticipantBuilder().GenerateInDatabase(Context, 3);
+
+        var response = await _httpClient.GetAsync(_baseUri);
+
+        var expectedParticipants = ContextForAsserts.Participant.ToList();
+
+        var participantsFromResponse = await response.Content.ReadFromJsonAsync<ICollection<Participant>>();
+
+        response.Should().Be200Ok();
+        participantsFromResponse?.Count.Should().NotBe(0);
+        participantsFromResponse.Should().BeEquivalentTo(expectedParticipants);
+    }
+
+    [Test]
+    public async Task GetByIdShouldReturnSuccessAndParticipant()
+    {
+        var participant = new ParticipantBuilder().GenerateInDatabase(Context);
+
+        var urlWithId = $"{_baseUri}/{participant.Id}";
+
+        var response = await _httpClient.GetAsync(urlWithId);
+
+        var participantFromDb = ContextForAsserts.Participant.First();
+
+        var participantFromResponse = await response.Content.ReadFromJsonAsync<Participant>();
+
+        response.Should().Be200Ok();
+        participantFromResponse.Should().BeEquivalentTo(participantFromDb);
+    }
+
+    [Test]
+    public async Task CreateShouldReturnSuccessAndParticipant()
     {
         var createParticipantRequest = new CreateParticipantRequestBuilder().Generate();
 
@@ -27,8 +61,10 @@ public class ParticipantEndpointTests : IntegrationTestsBase
 
         var participantFromDb = ContextForAsserts.Participant.First();
 
+        var participantFromResponse = await response.Content.ReadFromJsonAsync<Participant>();
+
         response.Should().Be200Ok();
-        response.Content.ShouldBeEquivalentTo<ParticipantResponse, Participant>(participantFromDb);
+        participantFromResponse.Should().BeEquivalentTo(participantFromDb);
     }
 
     [Test]
@@ -40,6 +76,8 @@ public class ParticipantEndpointTests : IntegrationTestsBase
 
         var response = await _httpClient.PostAsync(_baseUri, createParticipantRequest.ToJsonContent());
 
+        var problemDetails = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
+
         var customProblemDetailsExpected = new CustomProblemDetails(
             HttpStatusCode.BadRequest, 
             _baseUri, 
@@ -49,6 +87,6 @@ public class ParticipantEndpointTests : IntegrationTestsBase
             });
 
         response.Should().Be400BadRequest();
-        response.Content.ShouldBeEquivalentTo<CustomProblemDetails, CustomProblemDetails>(customProblemDetailsExpected);
+        problemDetails.Should().BeEquivalentTo(customProblemDetailsExpected);
     }
 }

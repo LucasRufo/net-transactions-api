@@ -12,6 +12,12 @@ public class ParticipantRepository
         _dbContext = context;
     }
 
+    public virtual async Task<ICollection<Participant>> Get()
+        => await _dbContext.Participant.ToListAsync();
+
+    public virtual async Task<Participant?> GetById(Guid id)
+        => await _dbContext.Participant.FirstOrDefaultAsync(x => x.Id == id);
+
     public virtual async Task<Participant?> GetByCPF(string cpf)
         => await _dbContext.Participant.FirstOrDefaultAsync(x => x.CPF == cpf);
 
