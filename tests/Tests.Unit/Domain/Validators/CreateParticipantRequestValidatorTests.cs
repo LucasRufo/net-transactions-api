@@ -1,6 +1,5 @@
 ﻿using Bogus.Extensions.Brazil;
 using FluentValidation.TestHelper;
-using NetTransactions.Api.Domain.Request;
 using NetTransactions.Api.Domain.Validators;
 using NetTransactions.Api.Infrastructure.Repositories;
 using Tests.Common.Builders.Domain.Entities;

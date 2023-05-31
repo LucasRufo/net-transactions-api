@@ -47,7 +47,7 @@ public class ParticipantRepositoryTests : IntegrationTestsBase
     {
         var expectedParticipant = new ParticipantBuilder().Generate();
 
-        await _participantRepository.Create(expectedParticipant);
+        await _participantRepository.Save(expectedParticipant);
 
         var participant = ContextForAsserts.Participant
                     .FirstOrDefault(x => x.Id == expectedParticipant.Id);

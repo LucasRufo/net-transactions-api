@@ -89,4 +89,79 @@ public class ParticipantEndpointTests : IntegrationTestsBase
         response.Should().Be400BadRequest();
         problemDetails.Should().BeEquivalentTo(customProblemDetailsExpected);
     }
+
+    [Test]
+    public async Task UpdateShouldReturnSuccessAndParticipant()
+    {
+        var generatedParticipant = new ParticipantBuilder().GenerateInDatabase(Context);
+
+        var updateParticipantRequest = new UpdateParticipantRequestBuilder()
+            .WithId(generatedParticipant.Id)
+            .Generate();
+
+        var urlWithId = $"{_baseUri}/{updateParticipantRequest.Id}";
+
+        var response = await _httpClient.PutAsync(urlWithId, updateParticipantRequest.ToJsonContent());
+
+        var participantFromDb = ContextForAsserts.Participant.First();
+
+        var participantFromResponse = await response.Content.ReadFromJsonAsync<Participant>();
+
+        response.Should().Be200Ok();
+        participantFromResponse.Should().BeEquivalentTo(participantFromDb);
+    }
+
+    [Test]
+    public async Task UpdateShouldReturnBadRequestWhenRequestIsInvalid()
+    {
+        var generatedParticipant = new ParticipantBuilder().GenerateInDatabase(Context);
+
+        var updateParticipantRequest = new UpdateParticipantRequestBuilder()
+            .WithId(generatedParticipant.Id)
+            .WithEmail("notanemailadress.com")
+            .Generate();
+
+        var urlWithId = $"{_baseUri}/{updateParticipantRequest.Id}";
+
+        var response = await _httpClient.PutAsync(urlWithId, updateParticipantRequest.ToJsonContent());
+
+        var problemDetails = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
+
+        var customProblemDetailsExpected = new CustomProblemDetails(
+            HttpStatusCode.BadRequest,
+            urlWithId,
+            new List<CustomProblemDetailsError>()
+            {
+                new CustomProblemDetailsError("Email", "'Email' is not a valid email address.")
+            });
+
+        response.Should().Be400BadRequest();
+        problemDetails.Should().BeEquivalentTo(customProblemDetailsExpected);
+    }
+
+    [Test]
+    public async Task UpdateShouldReturnBadRequestWhenIdFromPathAndFromEntityDontMatch()
+    {
+        var updateParticipantRequest = new UpdateParticipantRequestBuilder()
+            .Generate();
+
+        var urlWithId = $"{_baseUri}/{Guid.NewGuid()}";
+
+        var response = await _httpClient.PutAsync(urlWithId, updateParticipantRequest.ToJsonContent());
+
+        response.Should().Be400BadRequest();
+    }
+
+    [Test]
+    public async Task UpdateShouldReturnNotFoundWhenParticipantIsNotFound()
+    {
+        var updateParticipantRequest = new UpdateParticipantRequestBuilder()
+            .Generate();
+
+        var urlWithId = $"{_baseUri}/{updateParticipantRequest.Id}";
+
+        var response = await _httpClient.PutAsync(urlWithId, updateParticipantRequest.ToJsonContent());
+
+        response.Should().Be404NotFound();
+    }
 }

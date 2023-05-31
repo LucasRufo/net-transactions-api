@@ -32,7 +32,27 @@ public class ParticipantService
             CreatedAt = _dateTimeProvider.UtcNow
         };
 
-        await _participantRepository.Create(participant);
+        await _participantRepository.Save(participant);
+
+        return participant;
+    }
+
+    public async Task<ErrorOr<Participant>> Update(UpdateParticipantRequest request)
+    {
+        var participant = await _participantRepository.GetById(request.Id);
+
+        if (participant is null)
+            return Error.NotFound();
+
+        if (!string.IsNullOrWhiteSpace(request.Name))
+            participant.Name = request.Name;
+
+        if (!string.IsNullOrWhiteSpace(request.Email))
+            participant.Email = request.Email;
+
+        participant.UpdatedAt = _dateTimeProvider.UtcNow;
+
+        await _participantRepository.Save(participant);
 
         return participant;
     }

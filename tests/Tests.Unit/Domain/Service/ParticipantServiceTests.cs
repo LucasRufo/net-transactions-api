@@ -1,4 +1,6 @@
-﻿using NetTransactions.Api.Domain.Services;
+﻿using ErrorOr;
+using NetTransactions.Api.Domain.Entities;
+using NetTransactions.Api.Domain.Services;
 using NetTransactions.Api.Infrastructure.DateTimeProvider;
 using NetTransactions.Api.Infrastructure.Repositories;
 using Tests.Common.Builders.Domain.Entities;
@@ -72,5 +74,54 @@ public class ParticipantServiceTests : TestsBase
 
         participantResult.IsError.Should().BeFalse();
         participantResult.Value.Should().BeEquivalentTo(expectedParticipant);
+    }
+
+    [Test]
+    public async Task ShouldUpdateParticipant()
+    {
+        var updateParticipantRequest = new UpdateParticipantRequestBuilder().Generate();
+        var participantFake = new ParticipantBuilder()
+            .WithId(updateParticipantRequest.Id)
+            .Generate();
+        var updatedAtFake = Faker.Date.Past();
+
+        A.CallTo(() => AutoFake
+            .Resolve<IDateTimeProvider>().UtcNow)
+            .Returns(updatedAtFake);
+
+        A.CallTo(() => AutoFake
+            .Resolve<ParticipantRepository>().GetById(updateParticipantRequest.Id))
+            .Returns(participantFake);
+
+        var participantResult = await AutoFake.Resolve<ParticipantService>()
+            .Update(updateParticipantRequest);
+
+        var expectedParticipant = new ParticipantBuilder()
+            .WithId(updateParticipantRequest.Id)
+            .WithName(updateParticipantRequest.Name)
+            .WithCPF(participantFake.CPF)
+            .WithEmail(updateParticipantRequest.Email)
+            .WithCreatedAt(participantFake.CreatedAt)
+            .WithUpdateAt(updatedAtFake)
+            .Generate();
+
+        participantResult.IsError.Should().BeFalse();
+        participantResult.Value.Should().BeEquivalentTo(expectedParticipant);
+    }
+
+    [Test]
+    public async Task UpdateShouldReturnErrorWhenParticipantIsNotFound()
+    {
+        var updateParticipantRequest = new UpdateParticipantRequestBuilder().Generate();
+
+        A.CallTo(() => AutoFake
+            .Resolve<ParticipantRepository>().GetById(updateParticipantRequest.Id))
+            .Returns((Participant?)null);
+
+        var participantResult = await AutoFake.Resolve<ParticipantService>()
+            .Update(updateParticipantRequest);
+
+        participantResult.IsError.Should().BeTrue();
+        participantResult.FirstError.Type.Should().Be(ErrorType.NotFound);
     }
 }

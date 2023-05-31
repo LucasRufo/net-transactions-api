@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using ErrorOr;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using NetTransactions.Api.Controllers.Shared;
@@ -16,11 +17,15 @@ public class ParticipantController : ControllerBase
 {
     private readonly ParticipantService _participantService;
     private readonly IValidator<CreateParticipantRequest> _createParticipantValidator;
+    private readonly IValidator<UpdateParticipantRequest> _updateParticipantValidator;
 
-    public ParticipantController(ParticipantService participantService, IValidator<CreateParticipantRequest> validator)
+    public ParticipantController(ParticipantService participantService, 
+        IValidator<CreateParticipantRequest> createParticipantValidator, 
+        IValidator<UpdateParticipantRequest> updateParticipantValidator)
     {
         _participantService = participantService;
-        _createParticipantValidator = validator;
+        _createParticipantValidator = createParticipantValidator;
+        _updateParticipantValidator = updateParticipantValidator;
     }
 
     [HttpGet]
@@ -53,5 +58,24 @@ public class ParticipantController : ControllerBase
         var participant = await _participantService.Create(request);
 
         return Ok(participant.Value);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(Guid id, UpdateParticipantRequest request)
+    {
+        if (id != request.Id)
+            return BadRequest();
+
+        var validationResult = await _updateParticipantValidator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+            return BadRequest(new CustomProblemDetails(HttpStatusCode.BadRequest, Request.Path, validationResult.ToCustomProblemDetailsError()));
+
+        var updatedParticipantResult = await _participantService.Update(request);
+
+        if (updatedParticipantResult.IsError && updatedParticipantResult.FirstError.Type == ErrorType.NotFound)
+            return NotFound();
+
+        return Ok(updatedParticipantResult.Value);
     }
 }
