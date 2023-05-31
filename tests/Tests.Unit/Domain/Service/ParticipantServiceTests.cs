@@ -1,5 +1,6 @@
 ﻿using ErrorOr;
 using NetTransactions.Api.Domain.Entities;
+using NetTransactions.Api.Domain.Request;
 using NetTransactions.Api.Domain.Services;
 using NetTransactions.Api.Infrastructure.DateTimeProvider;
 using NetTransactions.Api.Infrastructure.Repositories;
@@ -120,6 +121,38 @@ public class ParticipantServiceTests : TestsBase
 
         var participantResult = await AutoFake.Resolve<ParticipantService>()
             .Update(updateParticipantRequest);
+
+        participantResult.IsError.Should().BeTrue();
+        participantResult.FirstError.Type.Should().Be(ErrorType.NotFound);
+    }
+
+    [Test]
+    public async Task ShouldDeleteParticipant()
+    {
+        var participant = new ParticipantBuilder().Generate();
+
+        A.CallTo(() => AutoFake
+            .Resolve<ParticipantRepository>().GetById(participant.Id))
+            .Returns(participant);
+
+        var participantResult = await AutoFake.Resolve<ParticipantService>()
+            .Delete(participant.Id);
+
+        participantResult.IsError.Should().BeFalse();
+        participantResult.Value.Should().BeTrue();
+    }
+
+    [Test]
+    public async Task DeleteShouldReturnNotFoundWhenParticipantIsNotFound()
+    {
+        var participant = new ParticipantBuilder().Generate();
+
+        A.CallTo(() => AutoFake
+            .Resolve<ParticipantRepository>().GetById(participant.Id))
+            .Returns((Participant?)null);
+
+        var participantResult = await AutoFake.Resolve<ParticipantService>()
+            .Delete(participant.Id);
 
         participantResult.IsError.Should().BeTrue();
         participantResult.FirstError.Type.Should().Be(ErrorType.NotFound);

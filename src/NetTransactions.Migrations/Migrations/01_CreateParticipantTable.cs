@@ -14,7 +14,8 @@ public class CreateParticipantTable : Migration
             .WithColumn("email").AsString(200).NotNullable()
             .WithColumn("cpf").AsString(11).NotNullable()
             .WithColumn("created_at").AsDateTime().NotNullable()
-            .WithColumn("updated_at").AsDateTime().Nullable();
+            .WithColumn("updated_at").AsDateTime().Nullable()
+            .WithColumn("deleted_at").AsDateTime().Nullable();
     }
 
     public override void Down() => Delete.Table(tableName);

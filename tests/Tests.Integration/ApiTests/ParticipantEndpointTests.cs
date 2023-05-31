@@ -164,4 +164,35 @@ public class ParticipantEndpointTests : IntegrationTestsBase
 
         response.Should().Be404NotFound();
     }
+
+    [Test]
+    public async Task DeleteShouldReturnNoContent()
+    {
+        var generatedParticipant = new ParticipantBuilder().GenerateInDatabase(Context);
+
+        var updateParticipantRequest = new UpdateParticipantRequestBuilder()
+            .WithId(generatedParticipant.Id)
+            .Generate();
+
+        var urlWithId = $"{_baseUri}/{updateParticipantRequest.Id}";
+
+        var response = await _httpClient.DeleteAsync(urlWithId);
+
+        var participantFromDb = ContextForAsserts.Participant.First();
+
+        response.Should().Be204NoContent();
+        participantFromDb.DeletedAt.Should().NotBeNull();
+    }
+
+    [Test]
+    public async Task DeleteShouldReturnNotFoundWhenParticipantIsNotFound()
+    {
+        var id = Guid.NewGuid();
+
+        var urlWithId = $"{_baseUri}/{id}";
+
+        var response = await _httpClient.DeleteAsync(urlWithId);
+
+        response.Should().Be404NotFound();
+    }
 }

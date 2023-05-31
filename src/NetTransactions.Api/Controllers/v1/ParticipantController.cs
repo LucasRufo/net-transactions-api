@@ -78,4 +78,15 @@ public class ParticipantController : ControllerBase
 
         return Ok(updatedParticipantResult.Value);
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var deletedParticipantResult = await _participantService.Delete(id);
+
+        if (deletedParticipantResult.IsError && deletedParticipantResult.FirstError.Type == ErrorType.NotFound)
+            return NotFound();
+
+        return NoContent();
+    }
 }

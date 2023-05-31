@@ -13,14 +13,17 @@ public class ParticipantRepository
         _dbContext = context;
     }
 
+    private IQueryable<Participant> BaseGet()
+        => _dbContext.Participant.Where(x => x.DeletedAt == null);
+
     public virtual async Task<ICollection<Participant>> Get()
-        => await _dbContext.Participant.OrderBy(x => x.CreatedAt).ToListAsync();
+        => await BaseGet().OrderBy(x => x.CreatedAt).ToListAsync();
 
     public virtual async Task<Participant?> GetById(Guid id)
-        => await _dbContext.Participant.FirstOrDefaultAsync(x => x.Id == id);
+        => await BaseGet().FirstOrDefaultAsync(x => x.Id == id);
 
     public virtual async Task<Participant?> GetByCPF(string cpf)
-        => await _dbContext.Participant.FirstOrDefaultAsync(x => x.CPF == cpf);
+        => await BaseGet().FirstOrDefaultAsync(x => x.CPF == cpf);
 
     public virtual async Task Save(Participant participant)
     {
