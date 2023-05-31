@@ -56,4 +56,18 @@ public class ParticipantService
 
         return participant;
     }
+
+    public async Task<ErrorOr<bool>> Delete(Guid id)
+    {
+        var participant = await _participantRepository.GetById(id);
+
+        if (participant is null)
+            return Error.NotFound();
+
+        participant.DeletedAt = _dateTimeProvider.UtcNow;
+
+        await _participantRepository.Save(participant);
+
+        return true;
+    }
 }
