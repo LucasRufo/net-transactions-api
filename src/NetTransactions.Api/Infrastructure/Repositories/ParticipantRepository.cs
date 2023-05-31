@@ -22,9 +22,9 @@ public class ParticipantRepository
     public virtual async Task<Participant?> GetByCPF(string cpf)
         => await _dbContext.Participant.FirstOrDefaultAsync(x => x.CPF == cpf);
 
-    public async Task Save(Participant participant)
+    public virtual async Task Save(Participant participant)
     {
-        if(!_dbContext.ExistsInTracker(participant))
+        if (!_dbContext.ExistsInTracker(participant))
             await _dbContext.AddAsync(participant);
 
         await _dbContext.SaveChangesAsync();

@@ -55,7 +55,7 @@ public class ParticipantEndpointTests : IntegrationTestsBase
     [Test]
     public async Task CreateShouldReturnSuccessAndParticipant()
     {
-        var createParticipantRequest = new ParticipantRequestBuilder().Generate();
+        var createParticipantRequest = new CreateParticipantRequestBuilder().Generate();
 
         var response = await _httpClient.PostAsync(_baseUri, createParticipantRequest.ToJsonContent());
 
@@ -70,7 +70,7 @@ public class ParticipantEndpointTests : IntegrationTestsBase
     [Test]
     public async Task CreateShouldReturnBadRequestWhenRequestIsInvalid()
     {
-        var createParticipantRequest = new ParticipantRequestBuilder()
+        var createParticipantRequest = new CreateParticipantRequestBuilder()
             .WithName("")
             .Generate();
 
@@ -88,5 +88,80 @@ public class ParticipantEndpointTests : IntegrationTestsBase
 
         response.Should().Be400BadRequest();
         problemDetails.Should().BeEquivalentTo(customProblemDetailsExpected);
+    }
+
+    [Test]
+    public async Task UpdateShouldReturnSuccessAndParticipant()
+    {
+        var generatedParticipant = new ParticipantBuilder().GenerateInDatabase(Context);
+
+        var updateParticipantRequest = new UpdateParticipantRequestBuilder()
+            .WithId(generatedParticipant.Id)
+            .Generate();
+
+        var urlWithId = $"{_baseUri}/{updateParticipantRequest.Id}";
+
+        var response = await _httpClient.PutAsync(urlWithId, updateParticipantRequest.ToJsonContent());
+
+        var participantFromDb = ContextForAsserts.Participant.First();
+
+        var participantFromResponse = await response.Content.ReadFromJsonAsync<Participant>();
+
+        response.Should().Be200Ok();
+        participantFromResponse.Should().BeEquivalentTo(participantFromDb);
+    }
+
+    [Test]
+    public async Task UpdateShouldReturnBadRequestWhenRequestIsInvalid()
+    {
+        var generatedParticipant = new ParticipantBuilder().GenerateInDatabase(Context);
+
+        var updateParticipantRequest = new UpdateParticipantRequestBuilder()
+            .WithId(generatedParticipant.Id)
+            .WithEmail("notanemailadress.com")
+            .Generate();
+
+        var urlWithId = $"{_baseUri}/{updateParticipantRequest.Id}";
+
+        var response = await _httpClient.PutAsync(urlWithId, updateParticipantRequest.ToJsonContent());
+
+        var problemDetails = await response.Content.ReadFromJsonAsync<CustomProblemDetails>();
+
+        var customProblemDetailsExpected = new CustomProblemDetails(
+            HttpStatusCode.BadRequest,
+            urlWithId,
+            new List<CustomProblemDetailsError>()
+            {
+                new CustomProblemDetailsError("Email", "'Email' is not a valid email address.")
+            });
+
+        response.Should().Be400BadRequest();
+        problemDetails.Should().BeEquivalentTo(customProblemDetailsExpected);
+    }
+
+    [Test]
+    public async Task UpdateShouldReturnBadRequestWhenIdFromPathAndFromEntityDontMatch()
+    {
+        var updateParticipantRequest = new UpdateParticipantRequestBuilder()
+            .Generate();
+
+        var urlWithId = $"{_baseUri}/{Guid.NewGuid()}";
+
+        var response = await _httpClient.PutAsync(urlWithId, updateParticipantRequest.ToJsonContent());
+
+        response.Should().Be400BadRequest();
+    }
+
+    [Test]
+    public async Task UpdateShouldReturnNotFoundWhenParticipantIsNotFound()
+    {
+        var updateParticipantRequest = new UpdateParticipantRequestBuilder()
+            .Generate();
+
+        var urlWithId = $"{_baseUri}/{updateParticipantRequest.Id}";
+
+        var response = await _httpClient.PutAsync(urlWithId, updateParticipantRequest.ToJsonContent());
+
+        response.Should().Be404NotFound();
     }
 }

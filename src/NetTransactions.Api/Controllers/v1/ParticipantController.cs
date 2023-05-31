@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using ErrorOr;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using NetTransactions.Api.Controllers.Shared;
@@ -15,12 +16,16 @@ namespace NetTransactions.Api.Controllers.v1;
 public class ParticipantController : ControllerBase
 {
     private readonly ParticipantService _participantService;
-    private readonly IValidator<ParticipantRequest> _participantValidator;
+    private readonly IValidator<CreateParticipantRequest> _createParticipantValidator;
+    private readonly IValidator<UpdateParticipantRequest> _updateParticipantValidator;
 
-    public ParticipantController(ParticipantService participantService, IValidator<ParticipantRequest> validator)
+    public ParticipantController(ParticipantService participantService, 
+        IValidator<CreateParticipantRequest> createParticipantValidator, 
+        IValidator<UpdateParticipantRequest> updateParticipantValidator)
     {
         _participantService = participantService;
-        _participantValidator = validator;
+        _createParticipantValidator = createParticipantValidator;
+        _updateParticipantValidator = updateParticipantValidator;
     }
 
     [HttpGet]
@@ -43,9 +48,9 @@ public class ParticipantController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(ParticipantRequest request)
+    public async Task<IActionResult> Create(CreateParticipantRequest request)
     {
-        var validationResult = await _participantValidator.ValidateAsync(request);
+        var validationResult = await _createParticipantValidator.ValidateAsync(request);
 
         if (!validationResult.IsValid)
             return BadRequest(new CustomProblemDetails(HttpStatusCode.BadRequest, Request.Path, validationResult.ToCustomProblemDetailsError()));
@@ -56,17 +61,19 @@ public class ParticipantController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, ParticipantRequest request)
+    public async Task<IActionResult> Update(Guid id, UpdateParticipantRequest request)
     {
-        //change back to CreateParticipantRequest and UpdateParticipantRequest
-        var validationResult = await _participantValidator.ValidateAsync(request);
+        if (id != request.Id)
+            return BadRequest();
+
+        var validationResult = await _updateParticipantValidator.ValidateAsync(request);
 
         if (!validationResult.IsValid)
             return BadRequest(new CustomProblemDetails(HttpStatusCode.BadRequest, Request.Path, validationResult.ToCustomProblemDetailsError()));
 
-        var updatedParticipantResult = await _participantService.Update(id, request);
+        var updatedParticipantResult = await _participantService.Update(request);
 
-        if (updatedParticipantResult.IsError && updatedParticipantResult.FirstError.Type == ErrorOr.ErrorType.NotFound)
+        if (updatedParticipantResult.IsError && updatedParticipantResult.FirstError.Type == ErrorType.NotFound)
             return NotFound();
 
         return Ok(updatedParticipantResult.Value);
