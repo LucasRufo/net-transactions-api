@@ -24,7 +24,9 @@ void ConfigureServices()
 
 void ConfigureApp()
 {
-    app.UseSwaggerCustom();
+    var pathbase = builder.Configuration["PathBase"];
+    app.UsePathBase(pathbase);
+    app.UseSwaggerCustom(pathbase ?? "");
     app.UseHealthCheck();
     app.MapControllers();
 }

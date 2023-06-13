@@ -1,0 +1,3 @@
+The net-transactions chart was installed!
+
+You can access the Swagger using this URL: http://localhost:8081/transactions/swagger
