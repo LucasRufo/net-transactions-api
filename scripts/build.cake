@@ -5,7 +5,7 @@ var target = Argument("target", "Default");
 var useCache = false;
 
 var migrationsProjectDirectory = "../src/NetTransactions.Migrations";
-var localSqlConnection = "Server=localhost;Database=transactions;Port=5432;User Id=localuser;Password=P@ssword123";
+var localSqlConnection = "Server=localhost;Database=transactions;Port=5432;User Id=desenv;Password=P@ssword123";
 
 var apiDirectory = "../src/NetTransactions.Api";
 var migrationsDirectory = "../src/NetTransactions.Migrations";

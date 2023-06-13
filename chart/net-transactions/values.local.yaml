@@ -1,0 +1,10 @@
+image:
+  pullPolicy: IfNotPresent
+
+autoScalling:
+  enabled: false
+
+istio:
+  enabled: true
+  gateways:
+    - istio-system/default-gateway

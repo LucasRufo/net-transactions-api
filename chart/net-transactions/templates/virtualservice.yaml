@@ -1,0 +1,22 @@
+{{ if .Values.istio.enabled }}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ include "net-transactions.fullname" . }}
+  labels:
+    {{- include "net-transactions.labels" . | nindent 4 }}
+spec:
+  gateways:
+  {{- toYaml .Values.istio.gateways | nindent 8 }}
+  hosts:
+  {{- toYaml .Values.istio.hosts | nindent 8 }}
+  http:
+  - name: "api-net-transactions"
+    match:
+    - uri:
+        prefix: {{ .Values.pathBase }}
+      ignoreUriCase: true
+    route:
+    - destination:
+        host: {{ include "net-transactions.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+{{ end }}

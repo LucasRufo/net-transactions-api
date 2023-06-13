@@ -1,0 +1,55 @@
+# Default values for net-transactions.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+pathBase: /transactions
+
+image:
+  repository: transactions/transactions-api
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+
+secrets:
+  DefaultConnectionString: "Server=postgres-postgresql-hl.default;Database=transactions;Port=5432;User Id=desenv;Password=P@ssword123"
+
+configs:
+  ASPNETCORE_ENVIRONMENT: Production
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: "net-transactions-service-account"
+
+podAnnotations:
+  description: "API created for study purposes."
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 5m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+istio:
+  enabled: true
+  port: 80
+  hosts:
+    - "*"
+  gateways:
+    - istio-ingress/transactions-gateway

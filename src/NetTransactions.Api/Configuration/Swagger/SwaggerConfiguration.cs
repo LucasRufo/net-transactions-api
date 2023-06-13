@@ -31,7 +31,7 @@ public static class SwaggerConfiguration
         return services;
     }
 
-    public static WebApplication UseSwaggerCustom(this WebApplication app)
+    public static WebApplication UseSwaggerCustom(this WebApplication app, string pathBase)
     {
         app.UseSwagger();
         app.UseSwaggerUI(
@@ -40,7 +40,7 @@ public static class SwaggerConfiguration
                 foreach (var description in app.DescribeApiVersions())
                 {
                     options.SwaggerEndpoint(
-                        $"/swagger/{description.GroupName}/swagger.json",
+                        $"{pathBase}/swagger/{description.GroupName}/swagger.json",
                         description.GroupName);
                 }
             });
