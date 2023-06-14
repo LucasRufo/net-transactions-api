@@ -2,6 +2,7 @@ using NetTransactions.Api.Configuration.ApplicationServices;
 using NetTransactions.Api.Configuration.DatabaseContext;
 using NetTransactions.Api.Configuration.HealthCheck;
 using NetTransactions.Api.Configuration.Swagger;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,8 @@ void ConfigureApp()
     var pathbase = builder.Configuration["PathBase"];
     app.UsePathBase(pathbase);
     app.UseSwaggerCustom(pathbase ?? "");
+    app.UseMetricServer();
+    app.UseHttpMetrics();
     app.UseHealthCheck();
     app.MapControllers();
 }

@@ -6,7 +6,7 @@ helm uninstall net-transactions -n net-transactions
 
 dotnet cake --target=BuildApiImage
 
-# dotnet cake --target=ExecuteMigrations
+dotnet cake --target=ExecuteMigrations
 
 kubectl label namespace net-transactions istio-injection=enabled --overwrite
 
